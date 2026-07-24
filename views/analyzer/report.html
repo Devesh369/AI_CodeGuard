@@ -1,0 +1,377 @@
+<%- include('../partials/header.html') %>
+
+<%
+function renderAsBullets(text) {
+    if (!text) return '<p class="text-xs text-slate-500 italic">Not available.</p>';
+    const lines = text.split('\n')
+        .map(l => l.trim().replace(/^[\-\*•\s]+/, '').trim())
+        .filter(l => l.length > 0);
+    
+    if (lines.length === 0) return `<p class="text-slate-600 dark:text-slate-300 text-sm font-medium">${text}</p>`;
+    
+    let html = '<ul class="space-y-3 list-none pl-0">';
+    lines.forEach(line => {
+        html += `<li class="text-slate-600 dark:text-slate-300 text-sm flex gap-3 items-start">
+            <span class="text-indigo-500 dark:text-indigo-400 font-bold text-base leading-none mt-0.5">•</span>
+            <span class="leading-relaxed font-semibold text-slate-700 dark:text-slate-200">${line}</span>
+        </li>`;
+    });
+    html += '</ul>';
+    return html;
+}
+
+function renderAsBulletsSmall(text) {
+    if (!text) return '<p class="text-[11px] text-slate-400 italic">Not available.</p>';
+    const lines = text.split('\n')
+        .map(l => l.trim().replace(/^[\-\*•\s]+/, '').trim())
+        .filter(l => l.length > 0);
+    
+    if (lines.length === 0) return `<p class="text-slate-600 dark:text-slate-300 text-xs font-medium">${text}</p>`;
+    
+    let html = '<ul class="space-y-2 list-none pl-0">';
+    lines.forEach(line => {
+        html += `<li class="text-slate-600 dark:text-slate-300 text-[11px] flex gap-2.5 items-start">
+            <span class="text-indigo-500 font-bold text-sm leading-none mt-0.5">•</span>
+            <span class="leading-relaxed font-semibold text-slate-600 dark:text-slate-300">${line}</span>
+        </li>`;
+    });
+    html += '</ul>';
+    return html;
+}
+%>
+
+<div class="max-w-7xl mx-auto px-4 py-8 space-y-8 animate-fade-in">
+    <!-- Header Summary Block -->
+    <div class="bg-slate-900 text-white rounded-2xl p-6 md:p-8 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6 border border-slate-800">
+        <div class="space-y-2">
+            <div class="flex items-center gap-3">
+                <span class="bg-blue-500/20 text-blue-400 text-xs font-bold px-3 py-1 rounded-full border border-blue-500/30 uppercase tracking-widest">Project Workspace</span>
+                <span class="text-slate-400 text-sm">Created: <%= new Date(project.createdAt).toLocaleDateString() %></span>
+            </div>
+            <h1 class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
+                <%= project.name %>
+            </h1>
+            <p class="text-slate-400 text-sm max-w-2xl">
+                <%= project.description || 'No description provided for this project.' %>
+            </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-4">
+            <a href="/report/<%= report.id %>/pdf" class="btn-vibrant-download inline-flex items-center justify-center gap-3 text-white font-bold px-6 py-3.5 rounded-xl text-sm transition-all duration-300">
+                <i class="fa-solid fa-cloud-arrow-down text-lg"></i>
+                Download PDF Report
+            </a>
+            <button type="button" onclick="openEmailModal()" class="btn-vibrant-email inline-flex items-center justify-center gap-3 text-white font-bold px-6 py-3.5 rounded-xl text-sm transition-all duration-300">
+                <i class="fa-solid fa-paper-plane text-lg"></i>
+                Email PDF Report
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabbed Navigation -->
+    <div class="border-b border-slate-200">
+        <div class="flex gap-8">
+            <button id="btn-project-tab" onclick="switchMainTab('project')" class="pb-4 font-semibold text-sm border-b-2 transition-all duration-150 flex items-center gap-2 text-blue-600 border-blue-600">
+                <i class="fa-solid fa-cubes"></i>
+                Project Executive AI Review
+            </button>
+            <button id="btn-files-tab" onclick="switchMainTab('files')" class="pb-4 font-semibold text-sm border-b-2 transition-all duration-150 flex items-center gap-2 text-slate-500 border-transparent hover:text-slate-800">
+                <i class="fa-solid fa-code"></i>
+                Active File Code Analyzer
+            </button>
+        </div>
+    </div>
+
+    <!-- TAB 1: EXECUTIVE AI REVIEW -->
+    <div id="tab-project-content" class="space-y-8">
+        <% if (project.aiReview) { %>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Executive Summary -->
+                <div class="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+                        <i class="fa-solid fa-compass text-blue-500"></i> Executive Summary
+                    </h3>
+                    <%- renderAsBullets(project.aiReview.executiveSummary) %>
+                </div>
+
+                <!-- Architectural Design & Boundaries -->
+                <div class="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+                        <i class="fa-solid fa-sitemap text-indigo-500"></i> Architecture & Design Review
+                    </h3>
+                    <%- renderAsBullets(project.aiReview.architectureReview) %>
+                </div>
+
+                <!-- Security Risk Assessment -->
+                <div class="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+                        <i class="fa-solid fa-shield-cat text-red-500"></i> Security Vulnerabilities
+                    </h3>
+                    <%- renderAsBullets(project.aiReview.securityReview) %>
+                </div>
+
+                <!-- Overall Code Quality -->
+                <div class="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+                        <i class="fa-solid fa-circle-check text-emerald-500"></i> Code Quality & Standards
+                    </h3>
+                    <%- renderAsBullets(project.aiReview.overallCodeQuality) %>
+                </div>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- TAB 2: ACTIVE FILE CODE ANALYZER -->
+    <div id="tab-files-content" class="hidden space-y-8">
+        <!-- File Switcher & Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <!-- Left Sidebar File List -->
+            <div class="md:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 space-y-3 shadow-sm">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Project Files (<%= projectReports.length %>)</h3>
+                <div class="space-y-1 max-h-96 overflow-y-auto">
+                    <% projectReports.forEach(function(r) { %>
+                        <button onclick="selectFileReport('<%= r.id %>')" id="file-btn-<%= r.id %>" 
+                            class="w-full text-left p-2.5 rounded-lg text-xs font-semibold flex items-center justify-between gap-2 transition-all <%= r.id === report.id ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800' %>">
+                            <span class="truncate"><%= r.fileName %></span>
+                            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded <%= r.pylintScore >= 8 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' %>">
+                                <%= r.pylintScore %>
+                            </span>
+                        </button>
+                    <% }) %>
+                </div>
+            </div>
+
+            <!-- Right File Metrics Header -->
+            <div class="md:col-span-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 shadow-sm">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div>
+                        <span class="text-xs text-indigo-500 font-bold uppercase tracking-wider">Active File Analysis</span>
+                        <h2 id="active-filename" class="text-xl font-bold text-slate-800 dark:text-slate-100"><%= report.fileName %></h2>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span id="active-score" class="text-2xl font-black text-emerald-600"><%= report.pylintScore %>/10</span>
+                        <span id="active-status" class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200"><%= report.qualityStatus %></span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg text-center">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase">Linter Flags</span>
+                        <p id="active-issue-count" class="text-lg font-bold text-amber-600"><%= report.issueCount %></p>
+                    </div>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg text-center">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase">Security Risks</span>
+                        <p id="active-security-count" class="text-lg font-bold <%= report.securityIssueCount > 0 ? 'text-red-500' : 'text-emerald-600' %>"><%= report.securityIssueCount %></p>
+                    </div>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg text-center">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase">Readability</span>
+                        <p id="active-readability" class="text-lg font-bold text-indigo-600"><%= report.readabilityScore || 8 %>/10</p>
+                    </div>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg text-center">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase">Maintainability</span>
+                        <p id="active-maintainability" class="text-lg font-bold text-blue-600"><%= report.maintainabilityScore || 8 %>/10</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Code Inspection Grid (Original Source vs Fixed Code) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Source Code Window -->
+            <div class="bg-slate-950 rounded-xl border border-slate-800 overflow-hidden shadow-xl flex flex-col">
+                <div class="bg-slate-900 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                        <span class="text-xs font-mono text-slate-400 ml-2">Original Source Code</span>
+                    </div>
+                    <button onclick="copyCodeToClipboard(this, 'active-source-code')" class="text-xs text-slate-400 hover:text-white bg-slate-800 px-3 py-1 rounded transition-all">
+                        <i class="fa-regular fa-copy"></i> Copy
+                    </button>
+                </div>
+                <pre class="p-4 overflow-x-auto text-xs font-mono text-slate-300 leading-relaxed max-h-96"><code id="active-source-code"><%= sourceCode %></code></pre>
+            </div>
+
+            <!-- Gemini Optimized Code Window -->
+            <div class="bg-slate-950 rounded-xl border border-slate-800 overflow-hidden shadow-xl flex flex-col">
+                <div class="bg-slate-900 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-emerald-400 text-xs"></i>
+                        <span class="text-xs font-mono text-emerald-400 font-bold">Gemini AI Corrected Code</span>
+                    </div>
+                    <button onclick="copyCodeToClipboard(this, 'active-fixed-code')" class="text-xs text-emerald-400 hover:text-emerald-300 bg-emerald-950/80 border border-emerald-800 px-3 py-1 rounded transition-all">
+                        <i class="fa-regular fa-copy"></i> Copy Corrected Code
+                    </button>
+                </div>
+                <pre class="p-4 overflow-x-auto text-xs font-mono text-emerald-200 leading-relaxed max-h-96"><code id="active-fixed-code"><%= fixedCode %></code></pre>
+            </div>
+        </div>
+
+        <!-- Static Analysis Issue Breakdowns (Pylint & Bandit) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Pylint Issues -->
+            <div class="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+                    <i class="fa-solid fa-list-check text-amber-500"></i> Pylint Convention Violations (<%= pylint.length %>)
+                </h3>
+                <div id="active-pylint-list" class="space-y-2 max-h-60 overflow-y-auto">
+                    <% if (pylint && pylint.length > 0) { %>
+                        <% pylint.forEach(function(issue) { %>
+                            <div class="p-3 bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 rounded-lg text-xs space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-amber-800 dark:text-amber-300">Line <%= issue.line %>: <%= issue.code %></span>
+                                    <span class="text-[10px] px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold"><%= issue.severity %></span>
+                                </div>
+                                <p class="text-slate-600 dark:text-slate-300 font-medium"><%= issue.message %></p>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <p class="text-xs text-slate-400 italic">No Pylint convention violations found.</p>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Bandit Security Issues -->
+            <div class="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+                    <i class="fa-solid fa-shield-triangle-exclamation text-red-500"></i> Bandit Security Threat Vectors (<%= security.length %>)
+                </h3>
+                <div id="active-bandit-list" class="space-y-2 max-h-60 overflow-y-auto">
+                    <% if (security && security.length > 0) { %>
+                        <% security.forEach(function(issue) { %>
+                            <div class="p-3 bg-red-50/50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 rounded-lg text-xs space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-red-800 dark:text-red-300">Line <%= issue.line %>: <%= issue.test %></span>
+                                    <span class="text-[10px] px-2 py-0.5 rounded bg-red-100 text-red-800 font-bold"><%= issue.severity %></span>
+                                </div>
+                                <p class="text-slate-600 dark:text-slate-300 font-medium"><%= issue.text %></p>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <p class="text-xs text-slate-400 italic">No security vulnerabilities detected by Bandit.</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- EMAIL MODAL DIALOG -->
+<div id="emailModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full border border-slate-200 dark:border-slate-800 p-6 space-y-6 shadow-2xl animate-fade-in">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <h3 class="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                <i class="fa-solid fa-paper-plane text-blue-500"></i> Email Security Report
+            </h3>
+            <button type="button" onclick="closeEmailModal()" class="text-slate-400 hover:text-slate-600 text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <form method="POST" action="/report/<%= report.id %>/email" class="space-y-4">
+            <div class="space-y-1.5">
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Recipient Email</label>
+                <input type="email" name="recipient_email" required placeholder="developer@organization.com" 
+                    class="block w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 text-sm focus:border-blue-500 focus:outline-none bg-slate-50 dark:bg-slate-800 font-medium text-slate-800 dark:text-slate-100">
+            </div>
+
+            <div class="pt-4 flex items-center justify-end gap-3">
+                <button type="button" onclick="closeEmailModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">
+                    Cancel
+                </button>
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md shadow-blue-500/20">
+                    Send PDF Report
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<%- include('../partials/footer.html') %>
+
+<script>
+const projectReportsData = <%- JSON.stringify(projectReports) %>;
+
+function switchMainTab(tabName) {
+    const projectTab = document.getElementById('tab-project-content');
+    const filesTab = document.getElementById('tab-files-content');
+    const btnProject = document.getElementById('btn-project-tab');
+    const btnFiles = document.getElementById('btn-files-tab');
+
+    if (tabName === 'project') {
+        projectTab.classList.remove('hidden');
+        filesTab.classList.add('hidden');
+        btnProject.className = 'pb-4 font-semibold text-sm border-b-2 transition-all duration-150 flex items-center gap-2 text-blue-600 border-blue-600';
+        btnFiles.className = 'pb-4 font-semibold text-sm border-b-2 transition-all duration-150 flex items-center gap-2 text-slate-500 border-transparent hover:text-slate-800';
+    } else {
+        projectTab.classList.add('hidden');
+        filesTab.classList.remove('hidden');
+        btnFiles.className = 'pb-4 font-semibold text-sm border-b-2 transition-all duration-150 flex items-center gap-2 text-blue-600 border-blue-600';
+        btnProject.className = 'pb-4 font-semibold text-sm border-b-2 transition-all duration-150 flex items-center gap-2 text-slate-500 border-transparent hover:text-slate-800';
+    }
+}
+
+function selectFileReport(reportId) {
+    const targetReport = projectReportsData.find(r => r.id === reportId);
+    if (!targetReport) return;
+
+    document.querySelectorAll('[id^="file-btn-"]').forEach(btn => {
+        btn.className = 'w-full text-left p-2.5 rounded-lg text-xs font-semibold flex items-center justify-between gap-2 transition-all text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800';
+    });
+    const activeBtn = document.getElementById(`file-btn-${reportId}`);
+    if (activeBtn) {
+        activeBtn.className = 'w-full text-left p-2.5 rounded-lg text-xs font-semibold flex items-center justify-between gap-2 transition-all bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800';
+    }
+
+    document.getElementById('active-filename').textContent = targetReport.fileName;
+    document.getElementById('active-score').textContent = targetReport.pylintScore + '/10';
+    document.getElementById('active-status').textContent = targetReport.qualityStatus;
+    document.getElementById('active-issue-count').textContent = targetReport.issueCount;
+    document.getElementById('active-security-count').textContent = targetReport.securityIssueCount;
+    document.getElementById('active-readability').textContent = (targetReport.readabilityScore || 8) + '/10';
+    document.getElementById('active-maintainability').textContent = (targetReport.maintainabilityScore || 8) + '/10';
+
+    document.getElementById('active-source-code').textContent = targetReport.sourceCode || '';
+    document.getElementById('active-fixed-code').textContent = targetReport.fixedCode || '';
+
+    // Render Pylint Issues
+    const pylintContainer = document.getElementById('active-pylint-list');
+    if (targetReport.pylintIssues && targetReport.pylintIssues.length > 0) {
+        pylintContainer.innerHTML = targetReport.pylintIssues.map(issue => `
+            <div class="p-3 bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 rounded-lg text-xs space-y-1">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-amber-800 dark:text-amber-300">Line ${issue.line}: ${issue.code}</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">${issue.severity}</span>
+                </div>
+                <p class="text-slate-600 dark:text-slate-300 font-medium">${issue.message}</p>
+            </div>
+        `).join('');
+    } else {
+        pylintContainer.innerHTML = '<p class="text-xs text-slate-400 italic">No Pylint convention violations found.</p>';
+    }
+
+    // Render Bandit Issues
+    const banditContainer = document.getElementById('active-bandit-list');
+    if (targetReport.banditIssues && targetReport.banditIssues.length > 0) {
+        banditContainer.innerHTML = targetReport.banditIssues.map(issue => `
+            <div class="p-3 bg-red-50/50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 rounded-lg text-xs space-y-1">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-red-800 dark:text-red-300">Line ${issue.line}: ${issue.test}</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-red-100 text-red-800 font-bold">${issue.severity}</span>
+                </div>
+                <p class="text-slate-600 dark:text-slate-300 font-medium">${issue.text}</p>
+            </div>
+        `).join('');
+    } else {
+        banditContainer.innerHTML = '<p class="text-xs text-slate-400 italic">No security vulnerabilities detected by Bandit.</p>';
+    }
+}
+
+function openEmailModal() {
+    document.getElementById('emailModal').classList.remove('hidden');
+}
+
+function closeEmailModal() {
+    document.getElementById('emailModal').classList.add('hidden');
+}
+</script>

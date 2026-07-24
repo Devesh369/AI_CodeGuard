@@ -1,0 +1,137 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CodeGuard AI Security Platform{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            purple: '#8B5CF6',
+                            violet: '#7C3AED',
+                            mint: '#10B981',
+                            emerald: '#059669',
+                            gold: '#F59E0B',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Custom Application CSS stylesheet -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- Global Application JS Controller -->
+    <script src="{% static 'js/main.js' %}" defer></script>
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+<div class="page-wrapper">
+
+    <!-- ================= Sidebar ================= -->
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">
+            <img src="{% static 'images/log_logo.png' %}" alt="CodeGuard Logo" class="logo-image">
+            <p class="logo-tagline">AI Code Security Platform</p>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{% url 'dashboard' %}">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'upload' %}">
+                    <i class="fa-solid fa-upload"></i>
+                    <span>Upload Code</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'my_files' %}">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <span>My Files</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'my_files' %}">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <span>Reports</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- ================= Main Content Container ================= -->
+    <main class="main-content" id="main-content">
+        <!-- Top Header Navigation Bar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="menu-btn" id="menu-toggle" aria-label="Toggle Sidebar Menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="user-greeting">
+                    Welcome back,
+                    <span class="username">
+                        {% if user.is_authenticated %}{{ user.username|title }}{% else %}Guest{% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <div class="topbar-right">
+                <button id="themeToggle" class="theme-btn" aria-label="Toggle Dark Mode">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="logout-btn">Login</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Global Alert Notifications -->
+        {% if messages %}
+            <div class="message-stack" style="margin: 20px;">
+                {% for message in messages %}
+                    <div class="alert {{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
+<!-- Chart.js Engine -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

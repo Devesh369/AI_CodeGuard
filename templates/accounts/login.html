@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | CodeGuard AI</title>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Clean Auth CSS -->
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+
+    <!-- Auth JS Controller -->
+    <script src="{% static 'js/auth.js' %}" defer></script>
+</head>
+
+<body>
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="logo">
+            <img src="{% static 'images/log_logo.png' %}" class="auth-logo" alt="CodeGuard Logo"> 
+            <p>AI Code Security Platform</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert error">
+                    <p>{{ message }}</p>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_username">Username</label>
+                <input type="text" name="username" id="id_username" placeholder="Enter username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="id_password">Password</label>
+                <div class="password-wrapper">
+                    <input type="password" name="password" id="id_password" placeholder="Enter password" required>
+                    <i class="fa-solid fa-eye toggle-password" id="togglePassword"></i>
+                </div>
+            </div>
+
+            <button class="auth-btn" type="submit">
+                Login
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            Don't have an account?
+            <a href="{% url 'register' %}">Register</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

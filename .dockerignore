@@ -1,0 +1,7 @@
+node_modules
+npm-debug.log
+dist
+data/temp/*
+.env
+.git
+.gitignore

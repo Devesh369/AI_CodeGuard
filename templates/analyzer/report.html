@@ -1,0 +1,288 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Report: {{ project.name }} | CodeGuard AI{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8 space-y-8 animate-fade-in">
+    <!-- Header Summary Block -->
+    <div class="bg-slate-900 text-white rounded-2xl p-6 md:p-8 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6 border border-slate-800">
+        <div class="space-y-2">
+            <div class="flex items-center gap-3">
+                <span class="bg-blue-500/20 text-blue-400 text-xs font-bold px-3 py-1 rounded-full border border-blue-500/30 uppercase tracking-widest">Project Workspace</span>
+                <span class="text-slate-400 text-sm">Created: {{ project.created_at|date:"d M Y" }}</span>
+            </div>
+            <h1 class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
+                {{ project.name }}
+            </h1>
+            <p class="text-slate-400 text-sm max-w-2xl">
+                {{ project.description|default:'No description provided.' }}
+            </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-4">
+            <a href="{% url 'report_pdf' report.id %}" class="btn-vibrant-download inline-flex items-center justify-center gap-3 text-white font-bold px-6 py-3.5 rounded-xl text-sm transition-all duration-300">
+                <i class="fa-solid fa-cloud-arrow-down text-lg"></i>
+                Download PDF Report
+            </a>
+            <button type="button" onclick="openEmailModal()" class="btn-vibrant-email inline-flex items-center justify-center gap-3 text-white font-bold px-6 py-3.5 rounded-xl text-sm transition-all duration-300">
+                <i class="fa-solid fa-paper-plane text-lg"></i>
+                Email PDF Report
+            </button>
+        </div>
+    </div>
+
+    <!-- AI Review Summary Cards Grid (Executive & Security) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Executive Review -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 shadow-sm">
+            <div class="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-sm border-b border-slate-100 dark:border-slate-800 pb-3">
+                <i class="fa-solid fa-compass text-base"></i>
+                <h3>Executive Review</h3>
+            </div>
+            <ul class="space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
+                {% if exec_review %}
+                    {% for item in exec_review %}
+                    <li class="flex items-start gap-2 leading-relaxed">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0"></span>
+                        <span>{{ item }}</span>
+                    </li>
+                    {% endfor %}
+                {% else %}
+                    <li class="flex items-start gap-2 leading-relaxed">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0"></span>
+                        <span>Analyzed 1 file(s) with an average score of {{ report.pylint_score }}/10.</span>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <!-- Security Review -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 shadow-sm">
+            <div class="flex items-center gap-2 text-red-600 dark:text-red-400 font-bold text-sm border-b border-slate-100 dark:border-slate-800 pb-3">
+                <i class="fa-solid fa-shield-halved text-base"></i>
+                <h3>Security Review</h3>
+            </div>
+            <ul class="space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
+                {% if sec_review %}
+                    {% for item in sec_review %}
+                    <li class="flex items-start gap-2 leading-relaxed">
+                        <span class="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0"></span>
+                        <span>{{ item }}</span>
+                    </li>
+                    {% endfor %}
+                {% else %}
+                    <li class="flex items-start gap-2 leading-relaxed">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0"></span>
+                        <span>No obvious security vulnerabilities were detected across the upload.</span>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Pylint & Bandit Detailed Findings Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Pylint Convention Violations -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 shadow-sm">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div class="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-sm">
+                    <i class="fa-solid fa-list-check text-base"></i>
+                    <h3>Pylint Convention Violations ({{ pylint_issues|length }})</h3>
+                </div>
+            </div>
+            {% if pylint_issues %}
+            <div class="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+                {% for issue in pylint_issues %}
+                <div class="p-3 bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 rounded-xl space-y-1 text-xs">
+                    <div class="flex items-center justify-between font-bold text-amber-900 dark:text-amber-300">
+                        <span>Line {{ issue.line }}: {{ issue.symbol }}</span>
+                        <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-100">{{ issue.type }}</span>
+                    </div>
+                    <p class="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">{{ issue.message }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-xs text-slate-400 italic">No Pylint convention violations found.</p>
+            {% endif %}
+        </div>
+
+        <!-- Bandit Security Threat Vectors -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 shadow-sm">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div class="flex items-center gap-2 text-red-600 dark:text-red-400 font-bold text-sm">
+                    <i class="fa-solid fa-bug text-base"></i>
+                    <h3>Bandit Security Threat Vectors ({{ bandit_issues|length }})</h3>
+                </div>
+            </div>
+            {% if bandit_issues %}
+            <div class="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+                {% for issue in bandit_issues %}
+                <div class="p-3 bg-red-50/60 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 rounded-xl space-y-1 text-xs">
+                    <div class="flex items-center justify-between font-bold text-red-900 dark:text-red-300">
+                        <span>Line {{ issue.line }}: {{ issue.test_id }}</span>
+                        <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded bg-red-200 dark:bg-red-900 text-red-900 dark:text-red-100">{{ issue.severity }}</span>
+                    </div>
+                    <p class="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">{{ issue.issue_text }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-xs text-slate-400 italic">No security vulnerabilities detected by Bandit.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recommendations Card -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 shadow-sm">
+        <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm border-b border-slate-100 dark:border-slate-800 pb-3">
+            <i class="fa-solid fa-lightbulb text-base"></i>
+            <h3>Recommendations</h3>
+        </div>
+        <ul class="space-y-2 text-xs text-slate-600 dark:text-slate-300">
+            {% if recommendations %}
+                {% for item in recommendations %}
+                <li class="flex items-start gap-2 leading-relaxed">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0"></span>
+                    <span>{{ item }}</span>
+                </li>
+                {% endfor %}
+            {% else %}
+                <li class="flex items-start gap-2 leading-relaxed">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0"></span>
+                    <span>Replace debug prints and TODO markers before release.</span>
+                </li>
+                <li class="flex items-start gap-2 leading-relaxed">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0"></span>
+                    <span>Add unit tests around upload, report generation, and email delivery.</span>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <!-- Active File Code Analyzer Section -->
+    <div class="space-y-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="md:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 space-y-3 shadow-sm">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Project Files ({{ projectReports.count }})</h3>
+                <div class="space-y-1 max-h-96 overflow-y-auto">
+                    {% for r in projectReports %}
+                        <a href="{% url 'report' r.id %}" 
+                            class="w-full text-left p-2.5 rounded-lg text-xs font-semibold flex items-center justify-between gap-2 transition-all {% if r.id == report.id %}bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800{% else %}text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800{% endif %}">
+                            <span class="truncate">{{ r.file_name }}</span>
+                            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded {% if r.pylint_score >= 8 %}bg-emerald-100 text-emerald-800{% else %}bg-amber-100 text-amber-800{% endif %}">
+                                {{ r.pylint_score }}
+                            </span>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="md:col-span-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 shadow-sm">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div>
+                        <span class="text-xs text-indigo-500 font-bold uppercase tracking-wider">Active File Analysis</span>
+                        <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">{{ report.file_name }}</h2>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl font-black text-emerald-600">{{ report.pylint_score }}/10</span>
+                        <span class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">{{ report.quality_status }}</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-2 gap-4">
+                    <div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg text-center">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase">Linter Flags</span>
+                        <p class="text-lg font-bold text-amber-600">{{ report.issue_count }}</p>
+                    </div>
+                    <div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg text-center">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase">Security Risks</span>
+                        <p class="text-lg font-bold {% if report.security_issue_count > 0 %}text-red-500{% else %}text-emerald-600{% endif %}">{{ report.security_issue_count }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Code Inspection Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-slate-950 rounded-xl border border-slate-800 overflow-hidden shadow-xl flex flex-col">
+                <div class="bg-slate-900 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                    <span class="text-xs font-mono text-slate-400">Original Source Code</span>
+                    <button onclick="copyCodeToClipboard(this, 'active-source-code')" class="text-xs text-slate-400 hover:text-white bg-slate-800 px-3 py-1 rounded transition-all">
+                        Copy
+                    </button>
+                </div>
+                <pre class="p-4 overflow-x-auto text-xs font-mono text-slate-300 leading-relaxed max-h-96"><code id="active-source-code">{{ sourceCode }}</code></pre>
+            </div>
+
+            <div class="bg-slate-950 rounded-xl border border-slate-800 overflow-hidden shadow-xl flex flex-col">
+                <div class="bg-slate-900 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                    <span class="text-xs font-mono text-emerald-400 font-bold">Gemini AI Corrected Code</span>
+                    <button onclick="copyCodeToClipboard(this, 'active-fixed-code')" class="text-xs text-emerald-400 hover:text-emerald-300 bg-emerald-950/80 border border-emerald-800 px-3 py-1 rounded transition-all">
+                        Copy Corrected Code
+                    </button>
+                </div>
+                <pre class="p-4 overflow-x-auto text-xs font-mono text-emerald-200 leading-relaxed max-h-96"><code id="active-fixed-code">{{ fixedCode }}</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- EMAIL MODAL DIALOG -->
+<div id="emailModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full border border-slate-200 dark:border-slate-800 p-6 space-y-6 shadow-2xl animate-fade-in">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <h3 class="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                <i class="fa-solid fa-paper-plane text-blue-500"></i> Email Security Report
+            </h3>
+            <button type="button" onclick="closeEmailModal()" class="text-slate-400 hover:text-slate-600 text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <form method="POST" action="{% url 'report_email' report.id %}" class="space-y-4">
+            {% csrf_token %}
+            <div class="space-y-1.5">
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Recipient Email</label>
+                <input type="email" name="recipient_email" required value="{{ request.user.email }}" placeholder="developer@organization.com" 
+                    class="block w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 text-sm focus:border-blue-500 focus:outline-none bg-slate-50 dark:bg-slate-800 font-medium text-slate-800 dark:text-slate-100">
+            </div>
+
+            <div class="pt-4 flex items-center justify-end gap-3">
+                <button type="button" onclick="closeEmailModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">
+                    Cancel
+                </button>
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md shadow-blue-500/20">
+                    Send PDF Report
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function openEmailModal() {
+    document.getElementById('emailModal').classList.remove('hidden');
+}
+
+function closeEmailModal() {
+    document.getElementById('emailModal').classList.add('hidden');
+}
+
+function copyCodeToClipboard(button, targetId) {
+    const codeElement = document.getElementById(targetId);
+    if (!codeElement) return;
+    const textToCopy = codeElement.innerText;
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        const originalText = button.innerText;
+        button.innerText = 'Copied!';
+        button.classList.add('bg-emerald-600', 'text-white');
+        setTimeout(() => {
+            button.innerText = originalText;
+            button.classList.remove('bg-emerald-600', 'text-white');
+        }, 2000);
+    });
+}
+</script>
+{% endblock %}

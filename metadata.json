@@ -1,0 +1,8 @@
+{
+  "name": "CodeGuard",
+  "description": "AI Code Security Platform analyzing code quality and security using Gemini.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,194 @@
+<%- include('../partials/header.html') %>
+
+<div class="max-w-4xl mx-auto px-4 py-8 space-y-8 animate-fade-in">
+    <!-- Header Summary Block -->
+    <div class="bg-gradient-to-r from-slate-900 via-slate-950 to-indigo-950 text-white rounded-2xl p-6 md:p-8 shadow-xl border border-slate-800 space-y-3 relative overflow-hidden">
+        <div class="absolute -right-10 -top-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl"></div>
+        
+        <div class="flex items-center gap-3">
+            <span class="bg-blue-500/20 text-blue-300 text-xs font-bold px-3 py-1 rounded-full border border-blue-500/30 uppercase tracking-wider">Deep Code Scanner</span>
+            <span class="text-xs text-slate-400">Standard: Pylint & Bandit v3</span>
+        </div>
+        <h1 class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">
+            Upload Python Project
+        </h1>
+        <p class="text-slate-400 text-sm max-w-2xl leading-relaxed">
+            Upload a complete Python ZIP project archive or select individual files. CodeGuard automatically extracts, structures, lint-checks, audits for security, and employs Gemini AI to design refactored corrections.
+        </p>
+    </div>
+
+    <!-- MAIN UPLOAD CONTAINER -->
+    <div id="upload-main-card" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-300">
+        <form method="POST" enctype="multipart/form-data" id="uploadForm" action="/upload" class="p-6 md:p-8 space-y-8">
+            <!-- Project Identification Group -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Project Title <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-folder-plus text-xs"></i>
+                        </span>
+                        <input type="text" name="project_name" required placeholder="e.g., PyCommerce Backend, Data-Pipeline" 
+                            class="block w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 focus:outline-none bg-slate-50/50 hover:bg-slate-50 transition-all font-medium text-slate-800">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Project Description <span class="text-slate-400 font-normal">(Optional)</span></label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-align-left text-xs"></i>
+                        </span>
+                        <input type="text" name="description" placeholder="e.g., REST API with JWT Auth and Sqlite" 
+                            class="block w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 focus:outline-none bg-slate-50/50 hover:bg-slate-50 transition-all font-medium text-slate-800">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload Dropzones -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+                <!-- ZIP Box -->
+                <label for="id_zip_file" class="group relative border-2 border-dashed border-slate-200 hover:border-blue-500/70 rounded-2xl p-6 md:p-8 flex flex-col items-center justify-center text-center cursor-pointer bg-slate-50/50 hover:bg-blue-50/10 transition-all duration-200 space-y-4">
+                    <input id="id_zip_file" type="file" name="zip_file" accept=".zip" hidden>
+                    
+                    <div class="w-16 h-16 rounded-full bg-blue-50 text-blue-500 group-hover:bg-blue-100/80 group-hover:scale-110 flex items-center justify-center transition-all shadow-sm">
+                        <i class="fa-solid fa-file-zipper text-2xl"></i>
+                    </div>
+                    <div class="space-y-1">
+                        <h3 class="text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors">ZIP Archive Project</h3>
+                        <p class="text-xs text-slate-500">Upload entire directory structured as a zip</p>
+                    </div>
+                    <span id="zipName" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 shadow-sm max-w-full truncate">
+                        Choose ZIP File
+                    </span>
+                </label>
+
+                <!-- Python Files Box -->
+                <label for="id_files" class="group relative border-2 border-dashed border-slate-200 hover:border-emerald-500/70 rounded-2xl p-6 md:p-8 flex flex-col items-center justify-center text-center cursor-pointer bg-slate-50/50 hover:bg-emerald-50/10 transition-all duration-200 space-y-4">
+                    <input id="id_files" type="file" name="files" accept=".py" multiple hidden>
+                    
+                    <div class="w-16 h-16 rounded-full bg-emerald-50 text-emerald-500 group-hover:bg-emerald-100/80 group-hover:scale-110 flex items-center justify-center transition-all shadow-sm">
+                        <i class="fa-solid fa-file-code text-2xl"></i>
+                    </div>
+                    <div class="space-y-1">
+                        <h3 class="text-sm font-bold text-slate-800 group-hover:text-emerald-600 transition-colors">Python Script Files</h3>
+                        <p class="text-xs text-slate-500">Upload one or multiple .py code scripts</p>
+                    </div>
+                    <span id="pythonNames" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 shadow-sm max-w-full truncate">
+                        Select .py scripts
+                    </span>
+                </label>
+            </div>
+
+            <!-- Submit trigger -->
+            <div class="pt-4 border-t border-slate-100 flex justify-end">
+                <button type="submit" class="w-full md:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold px-8 py-3.5 rounded-xl transition-all duration-150 shadow-lg shadow-blue-500/20 group hover:shadow-xl hover:scale-[1.01] cursor-pointer">
+                    <i class="fa-solid fa-wand-magic-sparkles text-sm group-hover:animate-pulse"></i>
+                    Analyze Project Engine
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- PROGRESS CONSOLE SCREEN -->
+    <div id="loading-console-card" class="hidden bg-slate-950 rounded-2xl border border-slate-850 shadow-2xl overflow-hidden animate-fade-in font-mono text-xs text-slate-300">
+        <div class="bg-slate-900 px-5 py-3.5 flex items-center justify-between border-b border-slate-800/80">
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                <span class="ml-2 text-slate-400 font-bold text-[11px] tracking-wide">codeguard-engine --process</span>
+            </div>
+            <span class="text-[10px] text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20 uppercase tracking-widest font-bold">AST Live Scan</span>
+        </div>
+        <div class="p-6 space-y-4">
+            <div id="console-logs" class="space-y-2 h-48 overflow-y-auto leading-relaxed">
+                <p class="text-slate-400">[SYSTEM] Initiating project upload handler...</p>
+                <p class="text-blue-400">[STAGE 1] Extracting repository archives and tokenizing files...</p>
+            </div>
+            <div class="space-y-1.5 pt-2 border-t border-slate-800">
+                <div class="flex items-center justify-between text-[11px]">
+                    <span id="progress-status" class="text-slate-400 font-bold">Pylint & Bandit Scanning...</span>
+                    <span id="progress-percent" class="text-indigo-400 font-bold">15%</span>
+                </div>
+                <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
+                    <div id="progress-bar" class="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 h-full w-[15%] transition-all duration-300"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer.html') %>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const zipInput = document.getElementById('id_zip_file');
+    const filesInput = document.getElementById('id_files');
+    const zipName = document.getElementById('zipName');
+    const pythonNames = document.getElementById('pythonNames');
+    const form = document.getElementById('uploadForm');
+
+    if (zipInput) {
+        zipInput.addEventListener('change', function () {
+            if (this.files && this.files.length > 0) {
+                zipName.textContent = '📦 ' + this.files[0].name;
+                zipName.classList.add('text-blue-600', 'bg-blue-50');
+            } else {
+                zipName.textContent = 'Choose ZIP File';
+                zipName.classList.remove('text-blue-600', 'bg-blue-50');
+            }
+        });
+    }
+
+    if (filesInput) {
+        filesInput.addEventListener('change', function () {
+            if (this.files && this.files.length > 0) {
+                pythonNames.textContent = '🐍 ' + this.files.length + ' file(s) chosen';
+                pythonNames.classList.add('text-emerald-600', 'bg-emerald-50');
+            } else {
+                pythonNames.textContent = 'Select .py scripts';
+                pythonNames.classList.remove('text-emerald-600', 'bg-emerald-50');
+            }
+        });
+    }
+
+    if (form) {
+        form.addEventListener('submit', function () {
+            const mainCard = document.getElementById('upload-main-card');
+            const consoleCard = document.getElementById('loading-console-card');
+            if (mainCard && consoleCard) {
+                mainCard.classList.add('hidden');
+                consoleCard.classList.remove('hidden');
+
+                const logs = document.getElementById('console-logs');
+                const bar = document.getElementById('progress-bar');
+                const percent = document.getElementById('progress-percent');
+                const status = document.getElementById('progress-status');
+
+                let step = 1;
+                const interval = setInterval(() => {
+                    step++;
+                    if (step === 2) {
+                        if (logs) logs.innerHTML += '<p class="text-amber-400">[STAGE 2] Running Pylint PEP-8 static checks...</p>';
+                        if (bar) bar.style.width = '45%';
+                        if (percent) percent.textContent = '45%';
+                        if (status) status.textContent = 'Evaluating Pylint Lint Scores...';
+                    } else if (step === 3) {
+                        if (logs) logs.innerHTML += '<p class="text-red-400">[STAGE 3] Running Bandit Security Vulnerability Scanner...</p>';
+                        if (bar) bar.style.width = '75%';
+                        if (percent) percent.textContent = '75%';
+                        if (status) status.textContent = 'Auditing Security Threat Vectors...';
+                    } else if (step === 4) {
+                        if (logs) logs.innerHTML += '<p class="text-emerald-400">[STAGE 4] Requesting Gemini AI Code Optimization...</p>';
+                        if (bar) bar.style.width = '92%';
+                        if (percent) percent.textContent = '92%';
+                        if (status) status.textContent = 'Generating AI Refactored Code...';
+                    }
+                }, 1500);
+            }
+        });
+    }
+});
+</script>

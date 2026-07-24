@@ -1,0 +1,296 @@
+<%- include('../partials/header.html') %>
+
+<div class="max-w-7xl mx-auto px-4 py-8 space-y-8 animate-fade-in">
+    <!-- Greeting Banner with Glowing Effects -->
+    <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-6 md:p-8 shadow-xl border border-slate-850 space-y-3 relative overflow-hidden">
+        <div class="absolute -right-12 -top-12 w-48 h-48 bg-indigo-500/15 rounded-full blur-3xl"></div>
+        <div class="absolute -left-12 -bottom-12 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl"></div>
+        
+        <div class="relative z-10 space-y-2">
+            <span class="bg-indigo-500/20 text-indigo-300 text-xs font-bold px-3 py-1 rounded-full border border-indigo-500/30 uppercase tracking-widest inline-block">
+                Master's Security Console
+            </span>
+            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">
+                CodeGuard AI Dashboard
+            </h1>
+            <p class="text-slate-400 text-sm max-w-3xl leading-relaxed">
+                High-fidelity Python Static Code Security Analysis using Abstract Syntax Trees (AST), PEP-8 compliance audits (via Pylint), security threat modeling (via Bandit), and automated LLM-driven generative optimization (via Gemini).
+            </p>
+        </div>
+    </div>
+
+    <!-- Stats Summary Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        <!-- Projects Analysed -->
+        <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md hover:border-slate-300 transition-all duration-200 group">
+            <div class="space-y-1">
+                <div class="flex items-center justify-between text-slate-400">
+                    <span class="text-xs font-bold uppercase tracking-wider">Active Projects</span>
+                    <i class="fa-solid fa-folder-closed text-sm text-blue-500"></i>
+                </div>
+                <div class="text-3xl font-extrabold text-slate-800 tracking-tight"><%= total_projects %></div>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-2 font-medium">Distinct workspace repositories</p>
+        </div>
+
+        <!-- Files Analysed -->
+        <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md hover:border-slate-300 transition-all duration-200 group">
+            <div class="space-y-1">
+                <div class="flex items-center justify-between text-slate-400">
+                    <span class="text-xs font-bold uppercase tracking-wider">Scripts Scanned</span>
+                    <i class="fa-solid fa-file-code text-sm text-indigo-500"></i>
+                </div>
+                <div class="text-3xl font-extrabold text-slate-800 tracking-tight"><%= total_files %></div>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-2 font-medium">Total analyzed Python modules</p>
+        </div>
+
+        <!-- Average Score -->
+        <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md hover:border-slate-300 transition-all duration-200 group">
+            <div class="space-y-1">
+                <div class="flex items-center justify-between text-slate-400">
+                    <span class="text-xs font-bold uppercase tracking-wider">Average Quality</span>
+                    <i class="fa-solid fa-star-half-stroke text-sm text-amber-500"></i>
+                </div>
+                <div class="flex items-baseline gap-1">
+                    <span class="text-3xl font-extrabold text-slate-800 tracking-tight"><%= average_score %></span>
+                    <span class="text-slate-400 text-xs font-bold">/10</span>
+                </div>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2 overflow-hidden">
+                <div class="h-full rounded-full bg-emerald-500" style="width: <%= average_score * 10 %>%;"></div>
+            </div>
+        </div>
+
+        <!-- Code Convention Issues -->
+        <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md hover:border-slate-300 transition-all duration-200 group">
+            <div class="space-y-1">
+                <div class="flex items-center justify-between text-slate-400">
+                    <span class="text-xs font-bold uppercase tracking-wider">Linter Flags</span>
+                    <i class="fa-solid fa-triangle-exclamation text-sm text-amber-500"></i>
+                </div>
+                <div class="text-3xl font-extrabold text-amber-500 tracking-tight"><%= total_code_issues %></div>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-2 font-medium">Active code convention violations</p>
+        </div>
+
+        <!-- Security Threat Vulnerabilities -->
+        <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md hover:border-slate-300 transition-all duration-200 group">
+            <div class="space-y-1">
+                <div class="flex items-center justify-between text-slate-400">
+                    <span class="text-xs font-bold uppercase tracking-wider">Security Risks</span>
+                    <i class="fa-solid fa-shield-halved text-sm <%= security_count > 0 ? 'text-red-500' : 'text-emerald-500' %>"></i>
+                </div>
+                <div class="text-3xl font-extrabold tracking-tight <%= security_count > 0 ? 'text-red-500' : 'text-emerald-500' %>">
+                    <%= security_count %>
+                </div>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-2 font-medium">High/Med Bandit threat vectors</p>
+        </div>
+    </div>
+
+    <!-- Charts Visualization Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm space-y-4">
+            <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2 pb-2 border-b border-slate-150">
+                <i class="fa-solid fa-chart-pie text-blue-500"></i>
+                Quality Grade Distribution (Pylint Modules)
+            </h3>
+            <div class="relative h-64 w-full flex items-center justify-center">
+                <canvas id="qualityChart"></canvas>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm space-y-4">
+            <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2 pb-2 border-b border-slate-150">
+                <i class="fa-solid fa-chart-column text-indigo-500"></i>
+                Quantitative Audit Metric Ratios
+            </h3>
+            <div class="relative h-64 w-full flex items-center justify-center">
+                <canvas id="securityChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pipeline Overview Cards -->
+    <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="space-y-2 md:col-span-1 border-b md:border-b-0 md:border-r border-slate-200 pb-4 md:pb-0 md:pr-6">
+            <div class="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center">
+                <i class="fa-solid fa-graduation-cap text-lg"></i>
+            </div>
+            <h3 class="text-sm font-bold text-slate-800">Static Pipeline</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+                CodeGuard evaluates python scripts without compiling execution threads, safeguarding environment infrastructure from arbitrary remote code vulnerability.
+            </p>
+        </div>
+
+        <div class="space-y-2 md:col-span-1 border-b md:border-b-0 md:border-r border-slate-200 pb-4 md:pb-0 md:pr-6">
+            <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
+                <i class="fa-solid fa-microchip text-lg"></i>
+            </div>
+            <h3 class="text-sm font-bold text-slate-800">AST Structural Logic</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+                The Bandit subsystem compares code structures against known cryptographic failures, shell-injection vectors, and insecure credentials.
+            </p>
+        </div>
+
+        <div class="space-y-2 md:col-span-1">
+            <div class="w-10 h-10 rounded-lg bg-purple-500/10 text-purple-600 flex items-center justify-center">
+                <i class="fa-solid fa-brain text-lg"></i>
+            </div>
+            <h3 class="text-sm font-bold text-slate-800">AI Deep Correction</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+                Gemini integrates linter reports directly into model context to formulate type-safe, corrected PEP-8 code output.
+            </p>
+        </div>
+    </div>
+
+    <!-- Lists Sections (Projects vs Scans) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Recent Projects Section -->
+        <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-150">
+                <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-folder-open text-blue-500"></i>
+                    Recent Project Workspaces
+                </h3>
+                <a href="/files" class="text-xs font-bold text-blue-600 hover:text-blue-700 hover:underline">View Portfolio</a>
+            </div>
+            <div class="divide-y divide-slate-100">
+                <% if (locals.recentProjects && recentProjects.length > 0) { %>
+                    <% recentProjects.forEach(function(proj) { %>
+                        <div class="py-3.5 flex items-center justify-between gap-4 group">
+                            <div class="space-y-1">
+                                <h4 class="text-xs font-bold text-slate-800 group-hover:text-blue-600 transition-colors"><%= proj.name %></h4>
+                                <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
+                                    <%= proj.fileCount %> files • <%= proj.totalIssues %> quality errors • <%= proj.totalSecurityIssues %> threat vectors
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs font-extrabold text-slate-700 bg-slate-100 px-2 py-1 rounded">
+                                    <%= proj.overallScore %>/10
+                                </span>
+                                <% if (proj.firstReportId) { %>
+                                    <a href="/report/<%= proj.firstReportId %>" class="text-[10px] font-bold text-white bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded-lg shadow-sm transition-all">Open Report</a>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="py-12 text-center text-xs text-slate-400 font-medium">No projects uploaded yet. Go to "Upload Code" to begin.</div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Latest Reports Section -->
+        <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-150">
+                <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-indigo-500"></i>
+                    Latest AST Module Audits
+                </h3>
+                <span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded uppercase tracking-widest animate-pulse">Live Feed</span>
+            </div>
+            <div class="divide-y divide-slate-100">
+                <% if (recent.length > 0) { %>
+                    <% recent.forEach(function(report) { %>
+                        <div class="py-3.5 flex items-center justify-between gap-4 group">
+                            <div class="space-y-1">
+                                <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-file-invoice text-slate-400 group-hover:text-indigo-500 transition-colors"></i>
+                                    <%= report.fileName %>
+                                </h4>
+                                <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
+                                    Audited: <%= new Date(report.analyzedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) %>
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full tracking-wider
+                                    <%= report.qualityStatus === 'Excellent' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                                        report.qualityStatus === 'Good' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
+                                        'bg-amber-50 text-amber-700 border border-amber-200' %>">
+                                    <%= report.qualityStatus %>
+                                </span>
+                                <a href="/report/<%= report.id %>" class="text-[10px] font-bold text-slate-600 hover:text-slate-800 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg transition-all hover:bg-slate-100">Details</a>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="py-12 text-center text-xs text-slate-400 font-medium">No static audit reports present in cache logs.</div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer.html') %>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Quality Chart
+    const qualityCanvas = document.getElementById("qualityChart");
+    if (qualityCanvas && typeof Chart !== 'undefined') {
+        new Chart(qualityCanvas, {
+            type: "doughnut",
+            data: {
+                labels: ["Excellent (9-10)", "Good (7-9)", "Needs Improvement (4-7)", "Poor (0-4)"],
+                datasets: [{
+                    data: [
+                        <%= excellent %>,
+                        <%= good %>,
+                        <%= improve %>,
+                        <%= poor %>
+                    ],
+                    backgroundColor: ["#10B981", "#3B82F6", "#F59E0B", "#EF4444"],
+                    hoverBackgroundColor: ["#059669", "#2563EB", "#D97706", "#DC2626"],
+                    borderWidth: 3,
+                    borderColor: "#ffffff"
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 800 },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { boxWidth: 10, padding: 15, font: { size: 10, weight: 'bold', family: 'sans-serif' } }
+                    }
+                }
+            }
+        });
+    }
+
+    // Security Chart
+    const securityCanvas = document.getElementById("securityChart");
+    if (securityCanvas && typeof Chart !== 'undefined') {
+        new Chart(securityCanvas, {
+            type: "bar",
+            data: {
+                labels: ["Modules Scanned", "Linter Issues Checked", "Threat Vectors Flagged"],
+                datasets: [{
+                    data: [
+                        <%= total_files %>,
+                        <%= total_code_issues %>,
+                        <%= security_count %>
+                    ],
+                    backgroundColor: ["#3b82f6", "#f59e0b", "#ef4444"],
+                    hoverBackgroundColor: ["#2563eb", "#d97706", "#dc2626"],
+                    borderRadius: 8,
+                    maxBarThickness: 45
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 800 },
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: "#f8fafc" }, ticks: { font: { size: 10, weight: 'bold' } } },
+                    x: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } }
+                }
+            }
+        });
+    }
+});
+</script>

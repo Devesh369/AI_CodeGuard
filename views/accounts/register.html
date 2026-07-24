@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | CodeGuard AI</title>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Clean Auth CSS -->
+    <link rel="stylesheet" href="/static/css/auth.css">
+
+    <!-- Auth JS Controller -->
+    <script src="/static/js/auth.js" defer></script>
+</head>
+
+<body>
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="logo">
+            <img src="/static/images/log_logo.png" class="auth-logo" alt="CodeGuard Logo"> 
+            <p>AI Code Security Platform</p>
+        </div>
+
+        <!-- Alert Notification Box -->
+        <% if (locals.error) { %>
+            <div class="alert error">
+                <p><%= error %></p>
+            </div>
+        <% } %>
+
+        <form method="POST" action="/register">
+            <div class="form-group">
+                <label for="id_username">Username</label>
+                <input type="text" name="username" id="id_username" placeholder="Choose a username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="id_email">Email</label>
+                <input type="email" name="email" id="id_email" placeholder="Enter email address" required>
+            </div>
+
+            <div class="form-group">
+                <label for="id_password1">Password</label>
+                <div class="password-wrapper">
+                    <input type="password" name="password" id="id_password1" placeholder="Enter password" required>
+                    <i class="fa-solid fa-eye toggle-password" id="togglePassword1"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_password2">Confirm Password</label>
+                <div class="password-wrapper">
+                    <input type="password" name="passwordConfirm" id="id_password2" placeholder="Confirm password" required>
+                    <i class="fa-solid fa-eye toggle-password" id="togglePassword2"></i>
+                </div>
+            </div>
+
+            <button class="auth-btn" type="submit">
+                Create Account
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            Already have an account?
+            <a href="/login">Login</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

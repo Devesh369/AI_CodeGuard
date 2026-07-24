@@ -1,0 +1,156 @@
+/* ==========================================================
+   CODEGUARD AUTH VIBRANT STYLING SYSTEM
+   Modern Grape Purple & Emerald Mint Theme
+   ========================================================== */
+
+body {
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(circle at top right, #311042 0%, #0F172A 100%);
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #F8FAFC;
+    overflow-x: hidden;
+}
+
+.auth-container {
+    width: 100%;
+    padding: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 440px;
+    background: rgba(21, 27, 44, 0.85); /* Smooth dark translucent card */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 45px 40px;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 50px rgba(124, 58, 237, 0.15);
+    transition: all 0.3s ease;
+}
+
+.auth-card:hover {
+    border-color: rgba(139, 92, 246, 0.3);
+    box-shadow: 0 30px 60px -10px rgba(0, 0, 0, 0.6), 0 0 60px rgba(124, 58, 237, 0.25);
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.auth-logo {
+    width: 160px;
+    height: auto;
+    display: block;
+    margin: 0 auto 12px;
+}
+
+.logo p {
+    color: #94A3B8;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+}
+
+.form-group {
+    margin-bottom: 22px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #C084FC; /* Purple accent label */
+}
+
+.form-group input {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #8B5CF6;
+    background: rgba(15, 23, 42, 0.9);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #94A3B8;
+    font-size: 15px;
+    transition: color 0.2s ease;
+}
+
+.toggle-password:hover {
+    color: #8B5CF6;
+}
+
+.auth-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 15px;
+    box-shadow: 0 10px 20px rgba(124, 58, 237, 0.2);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+}
+
+.auth-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 25px rgba(124, 58, 237, 0.35);
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 25px;
+    color: #94A3B8;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.auth-footer a {
+    color: #10B981; /* Accent mint green */
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.auth-footer a:hover {
+    color: #34D399;
+}
